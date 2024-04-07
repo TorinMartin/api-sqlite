@@ -1,0 +1,1 @@
+Very straight forward ASP.NET api which was started for an assesment but have continued playing around with it here and there. Entity Framework w/ Sqlite, dynamic service injection, generics, delegates, async/await, etc. :)
