@@ -1,3 +1,5 @@
 .idea/
 MusicApi/bin/
 MusicApi/obj/
+MusicApiTests/bin/
+MusicApiTests/obj/
