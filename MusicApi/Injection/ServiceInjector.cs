@@ -12,26 +12,20 @@ public static class ServiceInjector
             .Where(type => Attribute.IsDefined(type, typeof(InjectableAttribute)))
             .ToList();
         
-        //TODO: I can prob DRY this out a bit
         foreach (var type in injectableTypes)
         {
             if (Attribute.GetCustomAttribute(type, typeof(InjectableAttribute)) is not InjectableAttribute injectableAttribute) continue;
-            
             injectableAttribute.Types ??= new[] { type.GetInterfaces().FirstOrDefault() ?? type };
-            switch (injectableAttribute.Lifetime)
+
+            var addServiceDel = injectableAttribute.Lifetime switch
             {
-                case ServiceLifetime.Transient:
-                    foreach (var t in injectableAttribute.Types) services.AddTransient(t, type.IsGenericType ? type.MakeGenericType(t.GetGenericArguments()) : type);
-                    break;
-                case ServiceLifetime.Singleton:
-                    foreach (var t in injectableAttribute.Types) services.AddSingleton(t, type.IsGenericType ? type.MakeGenericType(t.GetGenericArguments()) : type);
-                    break;
-                case ServiceLifetime.Scoped:
-                    foreach (var t in injectableAttribute.Types) services.AddScoped(t, type.IsGenericType ? type.MakeGenericType(t.GetGenericArguments()) : type);
-                    break;
-                default:
-                    throw new Exception("Invalid service scope");
-            }
+                ServiceLifetime.Transient => new Func<Type, Type, IServiceCollection>(services.AddTransient),
+                ServiceLifetime.Singleton => services.AddSingleton,
+                ServiceLifetime.Scoped => services.AddScoped,
+                _ => throw new Exception("Invalid service scope")
+            };
+
+            foreach (var serviceType in injectableAttribute.Types) addServiceDel(serviceType, type.IsGenericType ? type.MakeGenericType(serviceType.GetGenericArguments()) : type);
         }
     } 
 }
