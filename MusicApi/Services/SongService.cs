@@ -26,7 +26,7 @@ public class SongService : BaseService<Song>, ISongService
     {
         var album = await _albumRepo.GetAsync(request.AlbumId);
         if (album is null) return await HandleServiceError<CountResult>("Invalid album id");
-        
+
         var song = new Song { Track = request.Track, Name = request.Name, Album = album };
         return await InsertAsync(song);
     }

@@ -1,6 +1,9 @@
-﻿namespace MusicApi.Model;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MusicApi.Model;
 
 public class Artist : BaseEntity
 {
-    public string Name { get; set; } = string.Empty;
+    [Required, MaxLength(256)]
+    public required string Name { get; set; }
 }
